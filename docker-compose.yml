@@ -1,0 +1,13 @@
+version: "3"
+services:
+  dotenv:
+    image: python:3.12-bullseye
+    container_name: dotenv
+    restart: always
+    env_file: .env
+  redis:
+    image: redis:latest
+    container_name: dotenv-redis
+    restart: always
+    volumes:
+      - "./data/redis_data:/data/redis"

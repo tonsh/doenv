@@ -1,3 +1,4 @@
 pytest-dotenv>=0.5.2
 pytest-env>=1.1.3
 redis>=5.0.3
+testcontainers-redis>=0.0.1rc1

@@ -31,10 +31,6 @@ jobs:
           pip install pylint flake8
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Analysing the code with pylint
+      - name: Lint with pylint & flake8
         run: |
-          pylint --rcfile=.pylintrc --recursive=y .
-
-      - name: Lint with flake8
-        run: |
-          flake8 . --count --max-complexity=10 --max-line-length=200 --ignore=F401 --statistics --show-source
+          make lint

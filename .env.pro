@@ -1,4 +1,4 @@
-APP_ENV="dev"
+APP_ENV="pro"
 
 REDIS_SERVER_HOST="dotenv-redis"
 REDIS_SERVER_PORT=6379

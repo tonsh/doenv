@@ -6,3 +6,9 @@ services:
       # Update this to wherever you want VS Code to mount the folder of your project
       - ..:/workspaces:cached
     command: /bin/sh -c "while sleep 1000; do :; done"
+  redis:
+    image: redis:latest
+    container_name: dotenv-redis
+    restart: always
+    volumes:
+      - "./tmp/redis_data:/data/redis"

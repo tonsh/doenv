@@ -1,7 +1,7 @@
 version: "3"
 services:
   dotenv:
-    image: python:3.12-bullseye
+    image: ghcr.io/meteo-x/peanut:release
     container_name: dotenv
     restart: always
     env_file: .env
@@ -10,4 +10,4 @@ services:
     container_name: dotenv-redis
     restart: always
     volumes:
-      - "./tmp/redis_data:/data/redis"
+      - "/data/redis_data:/data/redis"

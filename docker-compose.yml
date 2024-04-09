@@ -10,4 +10,4 @@ services:
     container_name: dotenv-redis
     restart: always
     volumes:
-      - "/data/redis_data:/data/redis"
+      - "/data/redis_data:/data"

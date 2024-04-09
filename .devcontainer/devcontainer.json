@@ -21,7 +21,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pip install -r requirements.txt && pip install dotbot ipython flake8",
+	"postCreateCommand": "pip install -r requirements.txt && pip install dotbot ipython flake8 testcontainers-redis",
 
 	// Configure tool-specific properties.
 	"customizations": {

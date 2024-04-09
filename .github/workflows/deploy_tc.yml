@@ -1,0 +1,39 @@
+name: Deploy to Tencent Cloud
+on:
+  workflow_run:
+    workflows:
+      - Build Docker Image
+    types:
+      - completed
+    branches:
+      - release
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: copy files via ssh key
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: "${{ secrets.TENCENT_CLOUD_HOST }}"
+          username: "${{ secrets.TENCENT_CLOUD_USERNAME }}"
+          key: ${{ secrets.TENCENT_SECRET_KEY }}
+          source: "docker-compose.yml, prometheus.yml, .env.pro"
+          target: "~/dotenv/"
+
+      - name: Deploy to Tencent Cloud
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: "${{ secrets.TENCENT_CLOUD_HOST }}"
+          username: "${{ secrets.TENCENT_CLOUD_USERNAME }}"
+          key: ${{ secrets.TENCENT_SECRET_KEY }}
+          script: |
+            cd ~/dotenv
+            cp .env.pro .env
+            docker-compose pull
+            docker-compose up --force-recreate -d
+            docker image prune -f

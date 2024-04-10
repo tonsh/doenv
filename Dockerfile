@@ -2,7 +2,7 @@ FROM python:3.12-bullseye
 
 WORKDIR /app
 
-RUN pip install dotbot flake8 ipython
+RUN pip install ipython
 
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt

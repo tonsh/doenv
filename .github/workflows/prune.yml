@@ -1,0 +1,58 @@
+name: Prune
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Prune unused resources in repository'
+        required: true
+        default: 'Runs'
+        type: 'choice'
+        options:
+          - 'Runs'
+          - 'Codespaces'
+          - 'Packages(Disabled)'
+      limit:
+        description: "Limit the number of items to be pruned"
+        required: true
+        default: 20
+        type: 'number'
+
+env:
+  GH_REPO: ${{ github.repository }}
+  GH_TOKEN: ${{ secrets.FINE_GRAINED_TOKEN }}
+  ORG_NAME: ${{ github.repository_owner }}
+  REPO_NAME: "doenv"
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: gh remove workflow runs
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'Runs' }}
+        run: |
+          for id in $(gh run list --repo="$GH_REPO" --json="databaseId" --jq=".[].databaseId" --limit=${{ github.event.inputs.limit }} --status="completed");
+          do
+            echo "Deleting run $id"
+            gh run delete --repo="$GH_REPO" $id
+          done;
+
+      - name: gh remove unused codespace
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'Codespaces' }}
+        run: |
+          gh codespace list --json="name" --jq=".[].name"
+          gh codespace delete --repo=${{ github.repository}}
+
+      # 使用 fine-grained token 不可以删除 Packages，该脚本暂时不可用
+      - name: gh remove unused packages
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'Packages' }}
+        run: |
+          echo "/user/packages/container/$REPO_NAME/versions"
+          gh api \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /user/packages/container/$REPO_NAME/versions

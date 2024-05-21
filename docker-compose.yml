@@ -1,7 +1,7 @@
 version: "3"
 services:
   dotenv:
-    image: ghcr.io/tonsh/doenv:release
+    image: tonsh/doenv:release
     container_name: dotenv
     restart: always
     env_file: .env

@@ -18,23 +18,24 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Login ghcr.io
-        uses: docker/login-action@v2
+        uses: actions/checkout@v4
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          ref: release
+
+      - name: Login docker-hub
+        uses: docker/login-action@v3
+        with:
+          username: tonsh
+          password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: ghcr.io/${{ env.IMAGE_NAME }}
+          images: tonsh/dotenv
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile

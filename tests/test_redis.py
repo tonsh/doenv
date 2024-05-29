@@ -16,21 +16,34 @@ def get_users() -> list[str]:
     return redis_client().lrange("test.user.names", 0, -1)  # type: ignore
 
 
+def add_user(user: str) -> None:
+    redis_client().lpush("test.user.names", user)
+
+
 class TestRedisClient(TestCase):
 
-    def setUp(self) -> None:
-        self.container = RedisContainer(image="redis:latest")
-        self.container.start()
+    @classmethod
+    def setUpClass(cls):
+        cls.container = RedisContainer(image="redis:latest")
+        cls.container.start()
 
         # mock redis server to redis testcontainer
-        os.environ["REDIS_SERVER_HOST"] = self.container.get_container_host_ip()
-        os.environ["REDIS_SERVER_PORT"] = self.container.get_exposed_port(6379)
+        os.environ["REDIS_SERVER_HOST"] = cls.container.get_container_host_ip()
+        os.environ["REDIS_SERVER_PORT"] = cls.container.get_exposed_port(6379)
+        super().setUpClass()
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.container.stop()
+        super().tearDownClass()
+
+    def setUp(self) -> None:
         self.redis_client = redis_client()
+        self.users = self.init_users()
         return super().setUp()
 
     def tearDown(self) -> None:
-        self.container.stop()
+        self.redis_client.delete("test.user.names")
         return super().tearDown()
 
     def init_users(self):
@@ -42,7 +55,15 @@ class TestRedisClient(TestCase):
         return users
 
     def test_get_users(self):
-        users = self.init_users()
+        users = get_users()
+        assert len(users) == len(self.users)
 
         for user in get_users():
-            assert user in users
+            assert user in self.users
+
+    def test_add_user(self):
+        add_user("David")
+
+        users = get_users()
+        assert "David" in users
+        assert len(users) == len(self.users) + 1
